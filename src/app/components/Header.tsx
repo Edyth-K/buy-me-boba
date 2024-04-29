@@ -11,6 +11,7 @@ import Image from 'next/image';
 export default function Header({session}:{session:Session|null}) {
     const name = session?.user?.name || '';
     const {last:firstName} = parseFullName(name);
+
     return (
         <>
         <header className="mb-16">
@@ -26,9 +27,8 @@ export default function Header({session}:{session:Session|null}) {
                 <div className="flex gap-4">
                     {session && (
                         <div className="">
-
-                            <button
-                                onClick={() => signOut()}
+                            <Link
+                                href={"/profile"}
                                 className="flex items-center gap-2 bg-blue-300 pl-2 pr-4 p-1 rounded-full"
                             >
                                 <Image src={session.user?.image as string} 
@@ -36,7 +36,7 @@ export default function Header({session}:{session:Session|null}) {
                                     width={36} height={36}
                                     className="rounded-full" />
                         {firstName}
-                            </button>
+                            </Link>
                         </div>
                     )}
                     {!session && (
