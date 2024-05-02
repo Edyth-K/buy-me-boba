@@ -6,6 +6,7 @@ import { useState } from "react";
 import { ProfileInfo } from "@/models/ProfileInfo";
 import Image from "next/image";
 import toast from "react-hot-toast";
+import { signOut } from "next-auth/react";
 
 
 type Props = {
@@ -19,21 +20,9 @@ export default function ProfileInfoForm({profileInfo}:Props) {
     const placeHolder = 'http://edyth-buymeboba.s3.us-east-2.amazonaws.com/q4glvokqy7g.svg';
 
     async function handleFormAction(formData: FormData) {
-        const savePromise = new Promise<void>(async (resolve, reject) => {
-            const result = await saveProfile(formData);
-            resolve();
-        })
-
-        toast.promise(
-            savePromise,
-             {
-               loading: 'Saving...',
-               success: <b>Settings saved!</b>,
-               error: <b>Could not save.</b>,
-             }
-        );
-       
-    }
+        await saveProfile(formData);
+        toast.success('Profile saved!');
+      }
 
     return (
         <form action={handleFormAction}>
@@ -47,7 +36,7 @@ export default function ProfileInfoForm({profileInfo}:Props) {
                 />
 
                 <div className="absolute left-4 -bottom-4 border size-24 bg-gray-100 rounded-lg">
-                    <div className="rounded-lg size-24 overflow-hidden">
+                    <div className="flex flex-shrink-0 rounded-lg size-24 overflow-hidden">
                         <Image 
                             src={profileInfo?.avatarUrl || placeHolder} 
                             alt="avatar"
@@ -68,28 +57,30 @@ export default function ProfileInfoForm({profileInfo}:Props) {
                 </div>
 
             </div>
-            <div>
-                <label className="block mt-4" htmlFor="usernameIn">Username</label>
-                <input 
-                    defaultValue={profileInfo?.username}
-                    name="username"
-                    id="usernameIn"
-                    type="text"
-                    placeholder="username"
-                />
+            <div className="grid grid-cols-2 gap-2">
+                <div>
+                    <label className="input-label" htmlFor="usernameIn">Username</label>
+                    <input 
+                        defaultValue={profileInfo?.username}
+                        name="username"
+                        id="usernameIn"
+                        type="text"
+                        placeholder="username"
+                    />
+                </div>
+                <div>
+                    <label className="input-label" htmlFor="displayNameIn">Display Name</label>
+                    <input 
+                        defaultValue={profileInfo?.displayName}
+                        name="displayName"
+                        id="displayNameIn"
+                        type="text"
+                        placeholder="display name" 
+                    />
+                </div>
             </div>
             <div>
-                <label className="block mt-4" htmlFor="displayNameIn">Display Name</label>
-                <input 
-                    defaultValue={profileInfo?.displayName}
-                    name="displayName"
-                    id="displayNameIn"
-                    type="text"
-                    placeholder="display name" 
-                />
-            </div>
-            <div>
-                <label className="block mt-4" htmlFor="bioIn">Bio</label>
+                <label className="input-label" htmlFor="bioIn">Bio</label>
                 <textarea 
                     defaultValue={profileInfo?.bio}
                     id="bioIn"
@@ -97,9 +88,14 @@ export default function ProfileInfoForm({profileInfo}:Props) {
                     placeholder="bio">
                 </textarea>
             </div>
-            <div>
+            <div className="flex justify-between">
                 <button className="bg-blue-300 px-4 py-2 rounded-lg mt-4">
                     save profile
+                </button>
+                <button
+                    className="mt-4 bg-gray-200 border border-gray-300 px-4 py-2 rounded-lg flex gap-2 items-center"
+                    onClick={() => signOut()} type="button">
+                    Logout
                 </button>
             </div>
         </form>
